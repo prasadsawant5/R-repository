@@ -1,0 +1,37 @@
+setwd("/Users/prasadsawant/Documents/Machine Learning/R/linear regression/auto-mpg")
+library(ggplot2)
+library(psych)
+
+auto_data <- read.table("auto-mpg.data")
+
+colnames(auto_data)[1] <- "mpg"
+colnames(auto_data)[2] <- "cylinders"
+colnames(auto_data)[3] <- "displacement"
+colnames(auto_data)[4] <- "horsepower"
+colnames(auto_data)[5] <- "weight"
+colnames(auto_data)[6] <- "acceleration"
+colnames(auto_data)[7] <- "model year"
+colnames(auto_data)[8] <- "origin"
+colnames(auto_data)[9] <- "car name"
+
+auto_data$origin <- NULL
+
+summary(auto_data)
+
+auto_data$horsepower <- as.numeric(auto_data$horsepower)
+auto_data$horsepower[is.na(auto_data$horsepower)] <- mean(auto_data$horsepower, na.rm = TRUE)
+
+ggplot(auto_data, aes(factor(cylinders), mpg)) + geom_boxplot(aes(fill=factor(cylinders)))
+
+auto_data$displacement <- NULL
+auto_data$cylinders <- NULL
+
+pairs.panels(auto_data)
+
+lm_model <- lm(mpg ~ ., auto_data[, -6])
+summary(lm_model)
+predicted <- predict.lm(lm_model, auto_data)
+summary(predicted)
+
+plot(auto_data$mpg, predicted, col="red")
+cor(auto_data$mpg, predicted)

@@ -1,0 +1,41 @@
+setwd("/Users/prasadsawant/Documents/Machine Learning/R/binary tree/breast-cancer-diagnosis")
+library(psych)
+library(C50)
+library(caret)
+library(ggplot2)
+
+cancerData <- read.csv("breast-cancer.data")
+
+colnames(cancerData)[1] <- "id"
+colnames(cancerData)[2] <- "clump_thickness"
+colnames(cancerData)[3] <- "cell_size"
+colnames(cancerData)[4] <- "cell_shape"
+colnames(cancerData)[5] <- "marginal_adhesion"
+colnames(cancerData)[6] <- "single_epithelial_cell_size"
+colnames(cancerData)[7] <- "bare_nuclei"
+colnames(cancerData)[8] <- "bland_chromatin"
+colnames(cancerData)[9] <- "normal_nucleoli"
+colnames(cancerData)[10] <- "mitoses"
+colnames(cancerData)[11] <- "class"
+
+cancerData$bare_nuclei <- as.numeric(cancerData$bare_nuclei)
+cancerData$bare_nuclei[is.na(cancerData$bare_nuclei)] <- mean(cancerData$bare_nuclei, na.rm = TRUE)
+cancerData$class <- as.factor(cancerData$class)
+cancerData$id <- NULL
+
+summary(cancerData)
+
+# pairs.panels(cancerData)
+
+# ggplot(cancerData, aes(factor(cell_size), class)) + geom_boxplot(aes(fill=factor(cell_size)))
+
+inTrain <- createDataPartition(cancerData$class, p = 0.7, list = FALSE)
+trainingData <- cancerData[inTrain, ]
+testingData <- cancerData[-inTrain, ]
+
+model <- C5.0(trainingData[-10], trainingData$class)
+
+predicted <- predict(model, testingData)
+
+confusionMatrix(testingData$class, predicted)
+
